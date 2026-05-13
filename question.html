@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brand Discovery — Bar Project</title>
+<meta name="description" content="A brand discovery workbook for new bar concepts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Geist:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F2EBE0;
+    --bg-card: #FBF7EF;
+    --ink: #1F1812;
+    --ink-soft: #4A3D33;
+    --muted: #8A7868;
+    --line: #D9CCB9;
+    --line-strong: #B8A48C;
+    --accent: #A8401E;
+    --accent-deep: #7A2D14;
+    --accent-soft: #F0DFD0;
+    --success: #4F6B3F;
+    --warn: #C68A2E;
+    --shadow: 0 2px 12px rgba(31, 24, 18, 0.06);
+    --shadow-lift: 0 8px 32px rgba(31, 24, 18, 0.10);
+    --r-sm: 4px;
+    --r-md: 8px;
+    --r-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Geist', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    font-size: 16px;
+    font-weight: 400;
+    overflow-x: hidden;
+  }
+
+  /* Grain texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.4;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.12 0 0 0 0 0.10 0 0 0 0 0.07 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* === LAYOUT === */
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 28px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* === HERO === */
+  .hero {
+    padding: 80px 0 60px;
+    position: relative;
+  }
+  .hero-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.1s forwards;
+  }
+  .hero-meta::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line-strong);
+    max-width: 200px;
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 350;
+    font-size: clamp(48px, 8vw, 88px);
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+    margin-bottom: 24px;
+    color: var(--ink);
+    font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 0;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.2s forwards;
+  }
+  .hero h1 em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--accent);
+    font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  }
+  .hero-sub {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    max-width: 540px;
+    font-style: italic;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.35s forwards;
+  }
+
+  /* === PROGRESS BAR === */
+  .progress-bar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(242, 235, 224, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+    padding: 14px 0;
+    opacity: 0;
+    animation: fadeIn 0.6s 0.5s forwards;
+  }
+  .progress-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .progress-label { white-space: nowrap; }
+  .progress-track {
+    flex: 1;
+    height: 2px;
+    background: var(--line);
+    position: relative;
+    overflow: hidden;
+  }
+  .progress-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: translateX(-100%);
+    transition: transform 0.4s ease;
+  }
+  .save-indicator {
+    opacity: 0;
+    transition: opacity 0.3s;
+    color: var(--success);
+    white-space: nowrap;
+  }
+  .save-indicator.visible { opacity: 1; }
+
+  /* === INTRO === */
+  .intro {
+    padding: 40px 0 64px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 64px;
+  }
+  .intro p {
+    font-size: 17px;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+    line-height: 1.65;
+  }
+  .intro p:last-child { margin-bottom: 0; }
+  .intro strong { color: var(--ink); font-weight: 500; }
+  .intro-rules {
+    margin-top: 32px;
+    padding: 24px 28px;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+  }
+  .intro-rules h3 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+    font-weight: 500;
+  }
+  .intro-rules ul { list-style: none; padding: 0; }
+  .intro-rules li {
+    padding: 6px 0 6px 22px;
+    position: relative;
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .intro-rules li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* === SECTION === */
+  section.workbook-section {
+    padding: 64px 0;
+    border-bottom: 1px solid var(--line);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  section.workbook-section.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .section-num {
+    font-family: 'Fraunces', serif;
+    font-size: 120px;
+    font-weight: 200;
+    line-height: 1;
+    color: var(--accent);
+    font-style: italic;
+    margin-bottom: -10px;
+    font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+    display: block;
+  }
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 38px;
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin-bottom: 16px;
+    color: var(--ink);
+    font-variation-settings: "opsz" 60, "SOFT" 30;
+  }
+  .why-matters {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    padding: 16px 0 16px 20px;
+    border-left: 2px solid var(--accent-soft);
+    margin-bottom: 36px;
+    max-width: 640px;
+  }
+  .why-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-style: normal;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+
+  /* === QUESTION === */
+  .question {
+    margin-bottom: 32px;
+  }
+  .q-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .q-text {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  .q-hint {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .sub-q {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 16px 0 6px;
+    font-weight: 500;
+  }
+
+  /* === INPUTS === */
+  textarea, input[type="text"] {
+    width: 100%;
+    font-family: 'Geist', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    padding: 12px 14px;
+    resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    border-radius: var(--r-sm);
+    line-height: 1.5;
+  }
+  textarea { min-height: 90px; font-family: 'Geist', sans-serif; }
+  textarea.tall { min-height: 130px; }
+  textarea:focus, input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(168, 64, 30, 0.08);
+  }
+  textarea::placeholder, input::placeholder {
+    color: var(--muted);
+    font-style: italic;
+    opacity: 0.7;
+  }
+
+  /* === ARCHETYPE GRID === */
+  .archetype-status {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    font-size: 13px;
+  }
+  .status-item { display: flex; align-items: center; gap: 8px; }
+  .status-chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .status-chip.primary { background: var(--accent); color: #fff; }
+  .status-chip.secondary { background: var(--accent-soft); color: var(--accent-deep); }
+  .status-value {
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .status-value.empty { color: var(--muted); font-style: italic; font-weight: 400; }
+  .clear-btn {
+    background: none;
+    border: 0;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 12px;
+    text-decoration: underline;
+    padding: 0;
+    font-family: inherit;
+  }
+  .clear-btn:hover { color: var(--accent); }
+
+  .archetype-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .archetype-card {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    padding: 18px 18px 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    border-radius: var(--r-sm);
+  }
+  .archetype-card:hover {
+    border-color: var(--line-strong);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+  .archetype-card.is-primary {
+    border-color: var(--accent);
+    background: #fff;
+    border-width: 2px;
+    padding: 17px 17px 13px;
+  }
+  .archetype-card.is-secondary {
+    border-color: var(--accent-soft);
+    background: #fff;
+    border-width: 2px;
+    padding: 17px 17px 13px;
+  }
+  .archetype-card.is-primary::before,
+  .archetype-card.is-secondary::before {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    padding: 2px 7px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .archetype-card.is-primary::before {
+    content: 'PRIMARY';
+    background: var(--accent);
+    color: #fff;
+  }
+  .archetype-card.is-secondary::before {
+    content: 'SECONDARY';
+    background: var(--accent-soft);
+    color: var(--accent-deep);
+  }
+  .arch-name {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 4px;
+    line-height: 1.1;
+  }
+  .arch-desc {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.45;
+    margin-bottom: 10px;
+  }
+  .arch-actions {
+    display: flex;
+    gap: 6px;
+  }
+  .arch-btn {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    padding: 5px 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.15s;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+  .arch-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* === ESSENCE SENTENCE === */
+  .essence-callout {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    padding: 28px 30px;
+    margin: 20px 0 24px;
+    font-family: 'Fraunces', serif;
+    font-size: 21px;
+    line-height: 1.7;
+    font-style: italic;
+    color: var(--ink);
+    font-variation-settings: "opsz" 24, "SOFT" 30;
+  }
+  .essence-callout .inline-input {
+    display: inline-block;
+    min-width: 120px;
+    border: 0;
+    border-bottom: 2px dashed var(--accent);
+    background: transparent;
+    font-family: 'Fraunces', serif;
+    font-size: 21px;
+    font-style: italic;
+    color: var(--accent-deep);
+    padding: 0 6px;
+    transition: all 0.2s;
+    font-variation-settings: "opsz" 24, "SOFT" 30;
+  }
+  .essence-callout .inline-input:focus {
+    outline: none;
+    border-bottom-style: solid;
+    background: rgba(168, 64, 30, 0.06);
+  }
+  .essence-callout .inline-input::placeholder {
+    color: var(--muted);
+    font-style: italic;
+    opacity: 0.6;
+  }
+
+  .essence-guide {
+    background: rgba(168, 64, 30, 0.04);
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    border-radius: var(--r-sm);
+  }
+  .essence-guide h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .essence-guide dl { margin: 0; }
+  .essence-guide dt {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent-deep);
+    font-weight: 500;
+    margin-top: 10px;
+  }
+  .essence-guide dt:first-child { margin-top: 0; }
+  .essence-guide dd {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    margin: 2px 0 0;
+  }
+
+  /* === BANNED CALLOUT === */
+  .banned-words {
+    background: #FBF1DC;
+    border: 1px solid #E0B871;
+    border-radius: var(--r-sm);
+    padding: 14px 18px;
+    margin: 16px 0 20px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .banned-words strong {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #8A5A0B;
+    font-weight: 500;
+  }
+
+  /* === FINISH SECTION === */
+  .finish {
+    padding: 80px 0 100px;
+    text-align: center;
+  }
+  .finish-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+  }
+  .finish h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 350;
+    font-size: clamp(36px, 6vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+    color: var(--ink);
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+  }
+  .finish h2 em {
+    font-style: italic;
+    color: var(--accent);
+    font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  }
+  .finish p {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: var(--ink-soft);
+    max-width: 520px;
+    margin: 0 auto 40px;
+    line-height: 1.55;
+    font-style: italic;
+  }
+  .completion-status {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    padding: 24px 28px;
+    margin: 0 auto 36px;
+    max-width: 480px;
+    border-radius: var(--r-md);
+    text-align: left;
+  }
+  .completion-status h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+    font-weight: 500;
+  }
+  .completion-checklist { list-style: none; padding: 0; }
+  .completion-checklist li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 0;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .completion-checklist li::before {
+    content: '○';
+    color: var(--muted);
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+  }
+  .completion-checklist li.done::before {
+    content: '●';
+    color: var(--success);
+  }
+  .completion-checklist li.done {
+    color: var(--ink);
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 360px;
+    margin: 0 auto;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 22px;
+    font-family: 'Geist', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: var(--r-sm);
+    transition: all 0.2s ease;
+    text-decoration: none;
+    border: 1px solid transparent;
+    text-align: center;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .btn-primary:hover {
+    background: var(--accent-deep);
+    border-color: var(--accent-deep);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lift);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--line-strong);
+  }
+  .btn-secondary:hover {
+    border-color: var(--ink);
+    background: rgba(31, 24, 18, 0.04);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border-color: transparent;
+    font-size: 13px;
+  }
+  .btn-ghost:hover {
+    color: var(--accent);
+  }
+  .btn-icon {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--ink);
+    color: var(--bg);
+    padding: 14px 22px;
+    border-radius: var(--r-md);
+    font-size: 14px;
+    box-shadow: var(--shadow-lift);
+    transition: transform 0.3s ease;
+    z-index: 100;
+    max-width: 90%;
+    text-align: center;
+  }
+  .toast.visible {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* === FOOTER === */
+  footer {
+    padding: 30px 0;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em;
+    border-top: 1px solid var(--line);
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* === ANIMATIONS === */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 600px) {
+    .container { padding: 0 20px; }
+    .hero { padding: 50px 0 40px; }
+    .archetype-grid { grid-template-columns: 1fr; }
+    .essence-callout {
+      padding: 22px 20px;
+      font-size: 18px;
+    }
+    .essence-callout .inline-input { font-size: 18px; min-width: 100px; }
+    .section-num { font-size: 80px; }
+    .section-title { font-size: 30px; }
+    section.workbook-section { padding: 48px 0; }
+    .actions { padding: 0 12px; }
+  }
+
+  /* Print friendly */
+  @media print {
+    .progress-bar, .actions, footer, .toast { display: none; }
+    section.workbook-section { opacity: 1; transform: none; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- PROGRESS BAR -->
+<div class="progress-bar">
+  <div class="progress-inner">
+    <span class="progress-label">PROGRESS</span>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <span id="progressText">0%</span>
+    <span class="save-indicator" id="saveIndicator">SAVED</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-meta">
+      <span>BRAND DISCOVERY</span>
+      <span>BAR PROJECT · DAY ZERO</span>
+    </div>
+    <h1>Before the bar,<br>the <em>brand</em>.</h1>
+    <p class="hero-sub">
+      Six short sections. Most are deliberately short — the hard part is committing to one answer, not writing long ones. Take 60 to 90 minutes, in one sitting.
+    </p>
+  </div>
+</section>
+
+<!-- INTRO -->
+<section class="intro">
+  <div class="container">
+    <p>
+      Before we get into business model, costs, location, or anything operational, we need to lock the brand. Everything else — pricing, customer, menu direction, marketing, even where the bar should physically be — gets easier once the brand is clear. Without it, every decision later becomes a 50/50 coin flip.
+    </p>
+    <p>
+      <strong>This is a forcing exercise.</strong> If you finish this with strong answers, the next phase (BMC, SWOT, customer segmentation) moves fast. If you can't answer something — that's the most useful signal of all. Mark it and we'll talk.
+    </p>
+
+    <div class="intro-rules">
+      <h3>Ground Rules</h3>
+      <ul>
+        <li>Answer in Thai or English — whichever you think in. Mix is fine.</li>
+        <li>Don't give multiple options for a single question. Pick one. If you can't decide, just write "can't decide" — that's a signal we work with.</li>
+        <li>Don't over-research. First-instinct answers reveal more than polished ones.</li>
+        <li>Your progress auto-saves to this browser. You can close and come back.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 1 — ARCHETYPE -->
+<section class="workbook-section" id="s1" data-section="1">
+  <div class="container">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Brand Archetype</h2>
+    <p class="why-matters">
+      <span class="why-label">WHY THIS MATTERS</span>
+      Every strong brand leans on one dominant personality. Pick the wrong one and your bar feels generic; pick the right one and every decision after this point sharpens.
+    </p>
+
+    <div class="archetype-status">
+      <div class="status-item">
+        <span class="status-chip primary">P</span>
+        <span class="status-value empty" id="primaryDisplay">Not selected</span>
+        <button class="clear-btn" onclick="clearArch('primary')" style="display:none" id="clearPrimary">clear</button>
+      </div>
+      <div class="status-item">
+        <span class="status-chip secondary">S</span>
+        <span class="status-value empty" id="secondaryDisplay">Not selected</span>
+        <button class="clear-btn" onclick="clearArch('secondary')" style="display:none" id="clearSecondary">clear</button>
+      </div>
+    </div>
+
+    <div class="archetype-grid" id="archetypeGrid"></div>
+
+    <div class="question">
+      <span class="q-num">1.1 / OPTIONAL</span>
+      <div class="q-text">Why this combination? What does it let you do that the alternatives wouldn't?</div>
+      <textarea data-field="archetype_rationale" placeholder="One or two sentences. The 'why' is more useful than the 'what.'"></textarea>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 2 — ESSENCE -->
+<section class="workbook-section" id="s2" data-section="2">
+  <div class="container">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Brand Essence Statement</h2>
+    <p class="why-matters">
+      <span class="why-label">WHY THIS MATTERS</span>
+      If you can't fill in this one sentence, the brand isn't real yet. This is the single most important answer in the workbook.
+    </p>
+
+    <div class="essence-callout">
+      "We are the
+      <input class="inline-input" data-field="essence_archetype" placeholder="archetype" style="width: 130px">
+      bar in
+      <input class="inline-input" data-field="essence_neighborhood" placeholder="neighborhood" style="width: 150px">
+      that
+      <input class="inline-input" data-field="essence_action" placeholder="unique action" style="width: 230px">
+      for
+      <input class="inline-input" data-field="essence_tribe" placeholder="tribe" style="width: 180px">,
+      so they feel
+      <input class="inline-input" data-field="essence_feeling" placeholder="emotional payoff" style="width: 200px">."
+    </div>
+
+    <div class="essence-guide">
+      <h4>Guidance per blank</h4>
+      <dl>
+        <dt>[archetype]</dt>
+        <dd>Use your answer from Section 1 (e.g., "Explorer" or "Lover-Creator").</dd>
+        <dt>[neighborhood]</dt>
+        <dd>Be specific. Not "Bangkok." Name the soi or sub-area.</dd>
+        <dt>[unique action]</dt>
+        <dd>The thing only this bar does. Not "serves drinks." Specific — "builds cocktails around overlooked Thai herbs," "plays one full vinyl album per night," "has no menu — bartender reads the room."</dd>
+        <dt>[tribe]</dt>
+        <dd>A narrow group. Not "everyone." Try age band + occupation/lifestyle + nationality mix.</dd>
+        <dt>[emotional payoff]</dt>
+        <dd>How guests feel walking out. Not "happy." Specific — "like an insider," "unhurried for the first time all week," "smarter than when they walked in."</dd>
+      </dl>
+    </div>
+
+    <div class="question">
+      <span class="q-num">2.1 / OPTIONAL</span>
+      <div class="q-text">Anything you want to add or clarify about the sentence above?</div>
+      <textarea data-field="essence_notes" placeholder="Notes, alternative phrasings, or the version in Thai if that's where it lands more naturally."></textarea>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 3 — ANTI BRAND -->
+<section class="workbook-section" id="s3" data-section="3">
+  <div class="container">
+    <span class="section-num">03</span>
+    <h2 class="section-title">The Anti-Brand</h2>
+    <p class="why-matters">
+      <span class="why-label">WHY THIS MATTERS</span>
+      This kills the scattered ideas. Every "what if we also did…" thought that doesn't survive this section gets cut. It's painful but it's the fastest way to focus.
+    </p>
+
+    <div class="question">
+      <div class="q-text">Three things this bar will absolutely NOT be.</div>
+      <p class="q-hint">
+        Examples: "Not a sports bar." "Not a place for groups of 8+." "Not cheap — we will not compete on price." "Not loud after 11pm." "Not Instagram-bait."
+      </p>
+
+      <div class="sub-q">(a) This bar will NOT be:</div>
+      <textarea data-field="anti_a" placeholder="Be brutal. Each one should feel like a small loss."></textarea>
+      <div class="sub-q">(b) This bar will NOT be:</div>
+      <textarea data-field="anti_b" placeholder=""></textarea>
+      <div class="sub-q">(c) This bar will NOT be:</div>
+      <textarea data-field="anti_c" placeholder=""></textarea>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4 — REFERENCES -->
+<section class="workbook-section" id="s4" data-section="4">
+  <div class="container">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Three References</h2>
+    <p class="why-matters">
+      <span class="why-label">WHY THIS MATTERS</span>
+      Abstract words like "cozy" or "vibrant" mean nothing to anyone but you. Concrete references mean we can actually align on the feeling.
+    </p>
+
+    <div class="question">
+      <span class="q-num">4.1</span>
+      <div class="q-text">Three bars (anywhere in the world) whose feeling you want to capture.</div>
+      <p class="q-hint">Not necessarily the same concept — same feeling. For each, what specifically you'd borrow.</p>
+      <div class="sub-q">Bar 1 — name, city, what to borrow:</div>
+      <textarea data-field="ref_bar_1" placeholder="e.g. Bar Trench, Tokyo — the way every guest gets the same level of bartender attention, regardless of order size."></textarea>
+      <div class="sub-q">Bar 2 — name, city, what to borrow:</div>
+      <textarea data-field="ref_bar_2" placeholder=""></textarea>
+      <div class="sub-q">Bar 3 — name, city, what to borrow:</div>
+      <textarea data-field="ref_bar_3" placeholder=""></textarea>
+    </div>
+
+    <div class="question">
+      <span class="q-num">4.2</span>
+      <div class="q-text">Three brands OUTSIDE hospitality whose vibe matches your bar.</div>
+      <p class="q-hint">A clothing label, a film, a magazine, a music label, a furniture brand, an album. Anything except food and drink.</p>
+      <div class="sub-q">Brand 1 — and what about it:</div>
+      <textarea data-field="ref_brand_1" placeholder=""></textarea>
+      <div class="sub-q">Brand 2 — and what about it:</div>
+      <textarea data-field="ref_brand_2" placeholder=""></textarea>
+      <div class="sub-q">Brand 3 — and what about it:</div>
+      <textarea data-field="ref_brand_3" placeholder=""></textarea>
+    </div>
+
+    <div class="question">
+      <span class="q-num">4.3</span>
+      <div class="q-text">Three sensory cues that define the bar.</div>
+      <p class="q-hint">Example: "Warm wood + low jazz + the smell of orange peel oils."</p>
+      <div class="sub-q">Smell:</div>
+      <input type="text" data-field="sense_smell" placeholder="">
+      <div class="sub-q">Sound:</div>
+      <input type="text" data-field="sense_sound" placeholder="">
+      <div class="sub-q">Material / texture:</div>
+      <input type="text" data-field="sense_material" placeholder="">
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 5 — PROMISE -->
+<section class="workbook-section" id="s5" data-section="5">
+  <div class="container">
+    <span class="section-num">05</span>
+    <h2 class="section-title">Brand Promise</h2>
+    <p class="why-matters">
+      <span class="why-label">WHY THIS MATTERS</span>
+      This is the single experience guarantee every guest leaves with. It's what you stake your reputation on. Operations, hiring, training, and quality control all answer to this one line.
+    </p>
+
+    <div class="question">
+      <span class="q-num">5.1</span>
+      <div class="q-text">The one thing every guest should be able to say after their visit.</div>
+      <p class="q-hint">
+        Bad answers (too generic): "Great drinks." "Good vibes."<br>
+        Good answers (specific, defensible): "Best Negroni variation in Bangna." "The bartender remembered my name on my second visit." "I learned something new about a spirit I thought I knew."
+      </p>
+      <textarea data-field="promise" class="tall" placeholder="One sentence. Specific enough to defend."></textarea>
+    </div>
+
+    <div class="question">
+      <span class="q-num">5.2</span>
+      <div class="q-text">How will you actually deliver this every single night? What has to be true operationally?</div>
+      <textarea data-field="promise_delivery" class="tall" placeholder="If the promise is 'the bartender remembers your name' — what needs to exist to make that happen? Notes. Memory training. Limited covers per night. Etc."></textarea>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 6 — TONE -->
+<section class="workbook-section" id="s6" data-section="6">
+  <div class="container">
+    <span class="section-num">06</span>
+    <h2 class="section-title">Tone of Voice</h2>
+    <p class="why-matters">
+      <span class="why-label">WHY THIS MATTERS</span>
+      This dictates how the brand speaks — on the menu, on Instagram, on the website, even how the staff greet guests. Three sharp adjectives lock this down.
+    </p>
+
+    <div class="banned-words">
+      <strong>BANNED WORDS — </strong>
+      "fun," "welcoming," "premium," "unique," "cozy," "vibrant." These are filler. Force yourself to pick adjectives that actually distinguish.
+    </div>
+
+    <p class="q-hint">
+      Good examples (texture, not filler): <em>"wry, generous, unhurried"</em> / <em>"sharp, irreverent, knowledgeable"</em> / <em>"warm, precise, low-key."</em>
+    </p>
+
+    <div class="question">
+      <span class="q-num">6.1</span>
+      <div class="q-text">Three tone-of-voice adjectives. They should sit together but not all mean the same thing.</div>
+      <div class="sub-q">Adjective 1:</div>
+      <input type="text" data-field="tone_1" placeholder="">
+      <div class="sub-q">Adjective 2:</div>
+      <input type="text" data-field="tone_2" placeholder="">
+      <div class="sub-q">Adjective 3:</div>
+      <input type="text" data-field="tone_3" placeholder="">
+    </div>
+
+    <div class="question">
+      <span class="q-num">6.2 / BONUS</span>
+      <div class="q-text">Write one sample Instagram caption for an opening-week post, in this tone.</div>
+      <p class="q-hint">A real test — if you can't make the adjectives work in one caption, they aren't the right adjectives.</p>
+      <textarea data-field="tone_sample" class="tall" placeholder=""></textarea>
+    </div>
+  </div>
+</section>
+
+<!-- FINISH -->
+<section class="finish" id="finish">
+  <div class="container">
+    <div class="finish-eyebrow">SECTION 7</div>
+    <h2>Send it <em>back</em>.</h2>
+    <p>
+      Pick whichever export works best. We'll go through it together — not to judge, but to stress-test the answers.
+    </p>
+
+    <div class="completion-status">
+      <h4>Completion Status</h4>
+      <ul class="completion-checklist" id="checklist">
+        <li data-check="1">Section 1 — Archetype</li>
+        <li data-check="2">Section 2 — Essence sentence</li>
+        <li data-check="3">Section 3 — Anti-brand</li>
+        <li data-check="4">Section 4 — References</li>
+        <li data-check="5">Section 5 — Promise</li>
+        <li data-check="6">Section 6 — Tone of voice</li>
+      </ul>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="downloadMarkdown()">
+        <span class="btn-icon">↓</span> Download as Markdown file
+      </button>
+      <button class="btn btn-secondary" onclick="copyToClipboard()">
+        <span class="btn-icon">⧉</span> Copy answers to clipboard
+      </button>
+      <button class="btn btn-secondary" onclick="sendEmail()">
+        <span class="btn-icon">✉</span> Open in email
+      </button>
+      <button class="btn btn-ghost" onclick="resetAll()">
+        reset and start over
+      </button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    Brand Discovery Workbook · Confidential · Day-Zero Bar Project
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ============= DATA =============
+  const ARCHETYPES = [
+    { id: 'lover', name: 'Lover', desc: 'Intimate, sensual, candlelit — cocktail bar for date nights and connection.' },
+    { id: 'outlaw', name: 'Outlaw', desc: 'Dive bar energy, punk, irreverent, anti-establishment.' },
+    { id: 'jester', name: 'Jester', desc: 'Party-forward, playful, loud, Saturday-night-out energy.' },
+    { id: 'explorer', name: 'Explorer', desc: 'Craft cocktail destination, ingredient-driven, discovery-led.' },
+    { id: 'sage', name: 'Sage', desc: 'Wine bar, whisky bar — expertise and curation are the draw.' },
+    { id: 'ruler', name: 'Ruler', desc: 'Premium hotel-bar feel — polished, statusful, refined.' },
+    { id: 'everyman', name: 'Everyman', desc: 'The neighborhood local — unpretentious, made for regulars.' },
+    { id: 'creator', name: 'Creator', desc: 'Listening bar, design-led, art-forward, curated aesthetic.' }
+  ];
+
+  const SECTION_FIELDS = {
+    1: ['__archetype_primary', '__archetype_secondary', 'archetype_rationale'],
+    2: ['essence_archetype', 'essence_neighborhood', 'essence_action', 'essence_tribe', 'essence_feeling'],
+    3: ['anti_a', 'anti_b', 'anti_c'],
+    4: ['ref_bar_1', 'ref_bar_2', 'ref_bar_3', 'ref_brand_1', 'ref_brand_2', 'ref_brand_3', 'sense_smell', 'sense_sound', 'sense_material'],
+    5: ['promise', 'promise_delivery'],
+    6: ['tone_1', 'tone_2', 'tone_3']
+  };
+
+  const STORAGE_KEY = 'brand_discovery_v1';
+  let state = loadState();
+
+  // ============= STATE =============
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : { fields: {}, archetype: { primary: null, secondary: null } };
+    } catch (e) {
+      return { fields: {}, archetype: { primary: null, secondary: null } };
+    }
+  }
+
+  let saveTimeout;
+  function saveState() {
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        showSaveIndicator();
+      } catch (e) {}
+      updateProgress();
+    }, 400);
+  }
+
+  function showSaveIndicator() {
+    const ind = document.getElementById('saveIndicator');
+    ind.classList.add('visible');
+    setTimeout(() => ind.classList.remove('visible'), 1200);
+  }
+
+  // ============= ARCHETYPE RENDER =============
+  function renderArchetypes() {
+    const grid = document.getElementById('archetypeGrid');
+    grid.innerHTML = '';
+    ARCHETYPES.forEach(a => {
+      const card = document.createElement('div');
+      card.className = 'archetype-card';
+      if (state.archetype.primary === a.id) card.classList.add('is-primary');
+      else if (state.archetype.secondary === a.id) card.classList.add('is-secondary');
+      card.innerHTML = `
+        <div class="arch-name">${a.name}</div>
+        <div class="arch-desc">${a.desc}</div>
+        <div class="arch-actions">
+          <button class="arch-btn" data-action="primary" data-id="${a.id}">Set Primary</button>
+          <button class="arch-btn" data-action="secondary" data-id="${a.id}">Set Secondary</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+    grid.querySelectorAll('.arch-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        const id = b.dataset.id;
+        const action = b.dataset.action;
+        if (action === 'primary') {
+          if (state.archetype.secondary === id) state.archetype.secondary = null;
+          state.archetype.primary = (state.archetype.primary === id) ? null : id;
+        } else {
+          if (state.archetype.primary === id) state.archetype.primary = null;
+          state.archetype.secondary = (state.archetype.secondary === id) ? null : id;
+        }
+        renderArchetypes();
+        updateArchetypeDisplay();
+        saveState();
+      });
+    });
+  }
+
+  function updateArchetypeDisplay() {
+    const pri = state.archetype.primary;
+    const sec = state.archetype.secondary;
+    const priDisp = document.getElementById('primaryDisplay');
+    const secDisp = document.getElementById('secondaryDisplay');
+    const clearPri = document.getElementById('clearPrimary');
+    const clearSec = document.getElementById('clearSecondary');
+
+    if (pri) {
+      priDisp.textContent = ARCHETYPES.find(a => a.id === pri).name;
+      priDisp.classList.remove('empty');
+      clearPri.style.display = 'inline';
+    } else {
+      priDisp.textContent = 'Not selected';
+      priDisp.classList.add('empty');
+      clearPri.style.display = 'none';
+    }
+    if (sec) {
+      secDisp.textContent = ARCHETYPES.find(a => a.id === sec).name;
+      secDisp.classList.remove('empty');
+      clearSec.style.display = 'inline';
+    } else {
+      secDisp.textContent = 'Not selected';
+      secDisp.classList.add('empty');
+      clearSec.style.display = 'none';
+    }
+  }
+
+  function clearArch(which) {
+    state.archetype[which] = null;
+    renderArchetypes();
+    updateArchetypeDisplay();
+    saveState();
+  }
+
+  // ============= FIELDS =============
+  function bindFields() {
+    document.querySelectorAll('[data-field]').forEach(el => {
+      const f = el.dataset.field;
+      if (state.fields[f] !== undefined) el.value = state.fields[f];
+      el.addEventListener('input', () => {
+        state.fields[f] = el.value;
+        saveState();
+      });
+    });
+  }
+
+  // ============= PROGRESS =============
+  function updateProgress() {
+    let totalFields = 0;
+    let filledFields = 0;
+    Object.keys(SECTION_FIELDS).forEach(s => {
+      SECTION_FIELDS[s].forEach(f => {
+        totalFields++;
+        if (f === '__archetype_primary') {
+          if (state.archetype.primary) filledFields++;
+        } else if (f === '__archetype_secondary') {
+          // optional — only count if filled
+          if (state.archetype.secondary) filledFields++;
+          else totalFields--;
+        } else {
+          const val = state.fields[f];
+          if (val && val.trim()) filledFields++;
+        }
+      });
+    });
+    const pct = Math.round((filledFields / totalFields) * 100);
+    document.getElementById('progressFill').style.transform = `translateX(-${100 - pct}%)`;
+    document.getElementById('progressText').textContent = pct + '%';
+
+    // Update checklist
+    Object.keys(SECTION_FIELDS).forEach(s => {
+      const required = SECTION_FIELDS[s].filter(f => f !== '__archetype_secondary');
+      let allDone = required.every(f => {
+        if (f === '__archetype_primary') return !!state.archetype.primary;
+        const v = state.fields[f];
+        return v && v.trim();
+      });
+      // Section 1 only requires primary archetype, rationale optional
+      if (s === '1') {
+        allDone = !!state.archetype.primary;
+      }
+      const li = document.querySelector(`[data-check="${s}"]`);
+      if (li) li.classList.toggle('done', allDone);
+    });
+  }
+
+  // ============= EXPORT =============
+  function buildMarkdown() {
+    const date = new Date().toISOString().slice(0, 10);
+    const f = state.fields;
+    const archName = (id) => id ? ARCHETYPES.find(a => a.id === id).name : '(not selected)';
+
+    const get = (key) => (f[key] && f[key].trim()) ? f[key].trim() : '_(no answer)_';
+
+    return `# Brand Discovery Workbook — Bar Project
+
+**Date submitted:** ${date}
+
+---
+
+## 1. Brand Archetype
+
+- **Primary:** ${archName(state.archetype.primary)}
+- **Secondary:** ${archName(state.archetype.secondary)}
+
+**Why this combination:**
+
+> ${get('archetype_rationale')}
+
+---
+
+## 2. Brand Essence Statement
+
+> "We are the **${get('essence_archetype')}** bar in **${get('essence_neighborhood')}** that **${get('essence_action')}** for **${get('essence_tribe')}**, so they feel **${get('essence_feeling')}**."
+
+**Additional notes:**
+
+> ${get('essence_notes')}
+
+---
+
+## 3. The Anti-Brand
+
+This bar will NOT be:
+
+1. ${get('anti_a')}
+2. ${get('anti_b')}
+3. ${get('anti_c')}
+
+---
+
+## 4. Three References
+
+### Reference Bars
+1. ${get('ref_bar_1')}
+2. ${get('ref_bar_2')}
+3. ${get('ref_bar_3')}
+
+### Reference Brands (outside hospitality)
+1. ${get('ref_brand_1')}
+2. ${get('ref_brand_2')}
+3. ${get('ref_brand_3')}
+
+### Sensory Cues
+- **Smell:** ${get('sense_smell')}
+- **Sound:** ${get('sense_sound')}
+- **Material / texture:** ${get('sense_material')}
+
+---
+
+## 5. Brand Promise
+
+**The one thing every guest should leave saying:**
+
+> ${get('promise')}
+
+**How we deliver it every night:**
+
+> ${get('promise_delivery')}
+
+---
+
+## 6. Tone of Voice
+
+**Three adjectives:** ${get('tone_1')}, ${get('tone_2')}, ${get('tone_3')}
+
+**Sample opening-week Instagram caption:**
+
+> ${get('tone_sample')}
+
+---
+
+_End of workbook._
+`;
+  }
+
+  function downloadMarkdown() {
+    const md = buildMarkdown();
+    const blob = new Blob([md], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const date = new Date().toISOString().slice(0, 10);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `brand-discovery-${date}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Downloaded. Send the .md file to your consultant.');
+  }
+
+  function copyToClipboard() {
+    const md = buildMarkdown();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(md).then(
+        () => showToast('Copied. Paste into LINE / email / Slack.'),
+        () => fallbackCopy(md)
+      );
+    } else {
+      fallbackCopy(md);
+    }
+  }
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showToast('Copied to clipboard.'); }
+    catch (e) { showToast('Copy failed. Try the download instead.'); }
+    document.body.removeChild(ta);
+  }
+
+  function sendEmail() {
+    const md = buildMarkdown();
+    const subject = encodeURIComponent('Brand Discovery Workbook — Bar Project');
+    // mailto can choke on huge bodies; truncate gracefully
+    const max = 1800;
+    const body = md.length > max
+      ? md.slice(0, max) + '\n\n[... message truncated. Download the full file from the workbook page and attach it.]'
+      : md;
+    window.location.href = `mailto:?subject=${subject}&body=${encodeURIComponent(body)}`;
+  }
+
+  function resetAll() {
+    if (!confirm('Clear all answers and start over? This cannot be undone.')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    state = { fields: {}, archetype: { primary: null, secondary: null } };
+    document.querySelectorAll('[data-field]').forEach(el => el.value = '');
+    renderArchetypes();
+    updateArchetypeDisplay();
+    updateProgress();
+    showToast('Reset.');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('visible');
+    setTimeout(() => t.classList.remove('visible'), 2800);
+  }
+
+  // ============= SCROLL REVEAL =============
+  function initScrollReveal() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
+    document.querySelectorAll('.workbook-section').forEach(s => observer.observe(s));
+  }
+
+  // ============= INIT =============
+  document.addEventListener('DOMContentLoaded', () => {
+    renderArchetypes();
+    updateArchetypeDisplay();
+    bindFields();
+    updateProgress();
+    initScrollReveal();
+  });
+</script>
+</body>
+</html>
